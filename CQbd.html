@@ -1,0 +1,893 @@
+<h1>Allgemein</h1>
+<article>
+	<p>
+		...
+	</p>
+</article>
+
+<h2 id="examples">Beispiele</h2>
+<article>...</article>
+
+<h2 id="install">Installation</h2>
+<article>...</article>
+
+<h1 id="getting-started">Und los geht's</h1>
+<article>
+	<p>
+		Jedes Programm startet in einer <code>main.ff</code>-Datei, oder einer <code>main(arr args
+            string){}</code>-<a href="#functions">Funktion</a>.
+		Programme bestehen aus Tokens. Tokens der Sprache CQbd sind:
+	</p>
+	<!--         Token-Liste -->
+	<ul>
+		<li></li>
+		<li></li>
+		<li></li>
+	</ul>
+	<!--        Kommentare-->
+	<p>
+		Für jede Klammer-auf muss es in der Datei eine Klammer-zu geben.
+		Andere Tokens haben andere Syntaxregeln, die beachtet werden müssen, die im Laufe dieser Erklärung noch
+		angesprochen werden.
+		Mehrere Tokens in einer bestimmten Syntax zusammen formieren Anweisungen.
+		Kommentare jedoch werden zwar mit einer Abfolge an Tokens eingeleitet, gehören allerdings nicht zu
+		Anweisungen, da sie vom Compiler komplett ignoriert werden, und nur zum Verständnis des Programmierers
+		beitragen. Der Code zeigt, was und wie es passiert, die Kommentare erklären, wieso. Eingeleitet wird ein
+		Kommentar mit einem Rautenzeichen und einem darauffolgenden Leerzeichen.
+		Alles, was in dieser Zeile folgt, gilt nun als Kommentar und wird vom Compiler ignoriert.
+		Für mehrzeilige Kommentare können drei aufeinanderfolgende Rautenzeichen genutzt werden. Alle
+		darauffolgenden Zeilen bis zu den nächsten drei Rautenzeichen sind Kommentare.
+	</p>
+	<pre>
+            # Das ist ein Kommentar über eine gesamte Zeile xD
+
+            someCode();
+
+            ###
+            Das ist eine -
+            nein, das sind zwei,
+            ja sogar drei Zeilen an Kommentaren :)
+            ###
+        </pre>
+	<!--        Literale usw.-->
+	<p>
+		Nach jeder Anweisung muss entweder eine neue Zeile beginnen, oder ein Semikolon stehen.
+		Anweisungen können entweder das Ausführen von <a href="#functions">Funktionen</a> oder von <a
+			href="#operator-expressions">Operator-Anweisungen</a> sein.
+		Operatoren sind Tokens, die eine bestimmte Wirkung vollbringen, also dazu fähig sind, die Daten, die
+		mithilfe anderer Tokens gegeben werden, zu manipulieren.
+		Literale sind eine spezielle Form der Tokens, welche Informationen enthalten. Zahlen sind grundsätzlich
+		immer Literale in CQbd, wie auch strings, also Zeichen innerhalb zweier Anführungszeichen.
+		Andere Token sind z.B. für die Definition von Variablen zuständig und werden <em>Schlüsselwörter</em>
+		genannt.
+	</p>
+	<h2 id="variables">Variablen</h2>
+	<p>
+		Variablen sind veränderliche Werte, also reservierte Speicherbereiche, deren Inhalt sich im Lauf des
+		Programms ändern kann.
+		Sie werden mit dem Schlüsselwort "<code>var</code>" erstellt, worauf der Name der Variable folgt.
+		Namen müssen mit einem Unterstrich "<code>_</code>", oder einem der Buchstaben des lateinischen Alphabets
+		beginnen.
+		Nach dem Namen kann entweder direkt ein Wert mittels des Zuweisungsoperatoren "<code>=</code>" zugewiesen
+		werden, oder der (nicht-abstrakte) <a href="#datatypes">Datentyp</a> der Variable angegeben werden, worauf
+		auch wieder eine Zuweisung folgen darf.
+		Syntax: var _name_ = _value_; var _name_ _datatype_
+	</p>
+	<pre>
+            var myVariable = 5
+            var my_variable string
+            var one int = 1
+            my_variable = "Hallo :)"
+        </pre>
+	<p>
+		Um Schreibarbeit zu verkürzen, ist es außerdem möglich, mehrere Variablen des gleichen Types oder Wertes mit
+		einer Operation zu definieren. Hierzu schreibt man wie gewohnt das Schlüsselwort <code>var</code>, worauf
+		jedoch
+		eine normale Klammer-auf folgt, die Namen der zu erstellenden Variablen mit Kommata voneinander getrennt
+		aufgeführt werden, und die Aufzählung mit einer Klammer-zu und entweder einer Deklaration oder Zuweisung
+		abgeschlossen wird.
+	</p>
+	<pre>
+            var (number_1,
+                number_2,
+                number_3) int
+            var (one, two) = 3
+        </pre>
+	<p>
+		Variablen existieren immer nur in dem Anwendungsbereich, in dem sie erstellt wurden. Wird eine Variable
+		innerhalb einer Schleife oder Funktion erstellt, ist sie nach Beendung dieser wieder zerstört. Um das zu
+		verhindern, kann eine Variable global gemacht werden. Damit wird sie einmal erstellt, und kann, nachdem der
+		Anwendungsbereich beendet wurde, dennoch durch Pointer erreicht werden (siehe unten).
+	</p>
+	<h2 id="pointers">Pointer</h2>
+	<p>
+		Pointer sind eine spezielle Variante von Variablen, die jedoch keinen Wert selbst enthalten, sondern auf
+		eine andere Variable "zeigen". Den Wert eines Pointers zu verändern, ist gleichzusetzen mit der direkten
+		Änderung der Variable, auf die der Pointer zeigt.
+		Syntaktisch wird ein Pointer mit dem Schlüsselwort "<code>ptr</code>" erstellt, worauf ein Name folgt, der
+		den gleichen Voraussetzungen wie ein Variablenname entsprechen muss.
+		Nach dem Namen folgt der (möglicherweise abstrakte) Datentyp der Variable, auf die der Pointer zeigen soll.
+		Sollte der Pointer auf nichts (<code>null</code>) zeigen dürfen, muss das anhand eines Fragezeichens nach
+		dem Datentypen symbolisiert werden. Danach kann dem Pointer eine Adresse zugewiesen werden, wobei es sich um
+		eine Hexadezimalzahl handelt. Um die Adresse einer Variable zu bekommen, gibt man den Variablennamen mit dem
+		Adressenoperatoren "<code>$</code>" davor an.
+	</p>
+	<!--        Null-Safety-->
+	<p>
+		Anstatt der Angabe des Datentypen kann auch direkt eine Zuweisung erfolgen, wobei allerdings auf die
+		Möglichkeit des null-pointers verzichtet werden muss.
+		Auch bei Pointern können wie bei Variablen mehrere gleichen Types gleichzeitig erstellt werden.
+	</p>
+	<pre>
+            var myVariable = 15
+            ptr my_pointer = $myVariable
+            ptr my_other_pointer int?
+            ptr (pon, pot) string? = null
+        </pre>
+	<h2 id="constants">Konstanten und globale Variablen</h2>
+	<p>
+		Variablen und Pointer existieren nur in ihrem Codeblock, also z.B. nur in der
+		<a href="#functions">Funktion</a> , Datei, oder <a href="#loops">Schleife</a>, in der sie erstellt wurden.
+		Sollte man eine Variable danach auch noch verwenden wollen, kann sie global erstellt werden. Dazu setzt man
+		vor das <code>var</code>-Schlüsselwort noch ein <code>global</code>.
+	</p>
+	<p>
+		Konstanten können nach ihrer Erstellung nicht mehr verändert werden. Ihnen muss bei der Deklaration ein Wert
+		zugewiesen werden. Wie auch bei globalen Variablen schreibt man bei Konstanten das Schlüsselwort vor die
+		Definition der Variable oder des Pointers. Das Schlüsselwort hierbei ist <code>const</code>.
+	</p>
+	<p>
+		Allgemein kann nach einem <code>global</code>- oder <code>const</code>-Schlüsselwort auch der Bezeichner
+		<code>var</code> weggelassen werden, da er automatisch ergänzt wird.
+	</p>
+	<pre>
+            global var x int
+            global y int
+            const ptr y = $x
+            global const var z = 42
+            y = $z      # Compiler-Error. Konstanten können nicht geändert werden.
+        </pre>
+	<p>
+		Der <a href="#datatypes">Datentyp</a> <code>any</code> ist ausschließlich Pointern vorenthalten. Ein Pointer
+		diesen Types kann auf einen Wert beliebigen Datentyps zeigen. Will mann allerdings z.B. aus einer Funktion
+		einen Wert beliebigen Datentyps zurückgeben, muss eine globale Variable erstellt werden, zu der ein Pointer
+		mit dem Datentypen "any" zeigt.
+	</p>
+	<pre>
+            fun doSomething(){
+                global var result = "lol"
+                return $result
+            }
+            # must be a ptr
+            ptr myResult any
+            myResult = doSomething()
+        </pre>
+	<p>
+		Auch legitim ist die
+	</p>
+	<h2 id="operators">Operatoren</h2>
+	<p>
+		Operatoren folgen keinem speziellen Muster, sondern werden in der folgenden Tabelle aufgeführt:
+	</p>
+	<!--         Arithmetische Operatoren -->
+	<table>
+		<thead>Arithmetische Operatoren</thead>
+		<tr>
+			<th>Name</th>
+			<th>Operator</th>
+			<th>Funktion</th>
+		</tr>
+		<tr>
+			<td>Addition</td>
+			<td>a + b</td>
+			<td>Addiert a und b</td>
+		</tr>
+		<tr>
+			<td>Subtraktion</td>
+			<td>a - b</td>
+			<td>Subtrahiert a und b</td>
+		</tr>
+		<tr>
+			<td>Multiplikation</td>
+			<td>a * b</td>
+			<td>Multipliziert a und b</td>
+		</tr>
+		<tr>
+			<td>Division</td>
+			<td>a / b</td>
+			<td>Dividiert a und b</td>
+		</tr>
+		<tr>
+			<td>Modulo</td>
+			<td>a % b</td>
+			<td>Gibt den Rest einer Ganzzahldivision zwischen a und b zurück</td>
+		</tr>
+		<tr>
+			<td>Potenzierung</td>
+			<td>a ** b</td>
+			<td>Gibt a hoch b zurück</td>
+		</tr>
+		<tr>
+			<td>Negierung</td>
+			<td>-a</td>
+			<td>Gibt (-1) * a zurück</td>
+		</tr>
+		<tr>
+			<td>Adressen-Operator</td>
+			<td>$a</td>
+			<td>Gibt die Adresse von a zurück</td>
+		</tr>
+		<tr>
+			<td>Wissenschaftler-Flex</td>
+			<td>a°b</td>
+			<!--suppress GrazieInspection -->
+			<td>Gibt a*10**b zurück</td>
+		</tr>
+		<tr>
+			<td>Fakultät</td>
+			<td>a!</td>
+			<!--suppress GrazieInspection -->
+			<td>Gibt die mathematische Fakultät von a zurück</td>
+		</tr>
+	</table>
+	<!--         Boolesche Operatoren -->
+	<table>
+		<thead>
+			Boolesche Operatoren, auch Vergleiche genannt, geben einen bool zurück: true, wenn die Bedingung erfüllt ist
+			und false, wenn
+			nicht. Sie überprüfen, ob...
+		</thead>
+		<tr>
+			<th>Name</th>
+			<th>Operator</th>
+			<th>Funktion</th>
+		</tr>
+		<tr>
+			<td>Gleichheit</td>
+			<td>a == b</td>
+			<td>a und b den gleichen Wert haben.</td>
+		</tr>
+		<tr>
+			<td>Ungleichheit</td>
+			<td>a != b</td>
+			<td>a und b einen unterschiedlichen Wert haben.</td>
+		</tr>
+		<tr>
+			<td>Größer-als</td>
+			<td>a > b</td>
+			<td>a größer als b ist.</td>
+		</tr>
+		<tr>
+			<td>Kleiner-als</td>
+			<td>a < b</td>
+			<td>a kleiner als b ist.</td>
+		</tr>
+		<tr>
+			<td>Größer-gleich</td>
+			<td>a >= b</td>
+			<td>a größer gleich b ist.</td>
+		</tr>
+		<tr>
+			<td>Kleiner-gleich</td>
+			<td>a <= b</td>
+			<td>a kleiner gleich b ist.</td>
+		</tr>
+	</table>
+	<!--         Logische Operatoren -->
+	<table>
+		<thead>
+			Logische Operatoren sind wie Boolesche Operatoren, die Boolesche Werte überprüfen. Sie geben true
+			zurück, wenn
+		</thead>
+		<tr>
+			<th>Name</th>
+			<th>Operator</th>
+			<th>Funktion</th>
+		</tr>
+		<tr>
+			<td>UND</td>
+			<td>a and b</td>
+			<td>a und b true sind.</td>
+		</tr>
+		<tr>
+			<td>ODER</td>
+			<td>a or b</td>
+			<td>a oder b true ist, oder wenn beide true sind.</td>
+		</tr>
+		<tr>
+			<td>EXKLUSIV-ODER</td>
+			<td>a xor b</td>
+			<td>a oder b true ist, aber nicht beide.</td>
+		</tr>
+		<tr>
+			<td>KEINER</td>
+			<td>a nor b</td>
+			<td>a und b false sind.</td>
+		</tr>
+		<tr>
+			<td>NICHT</td>
+			<td>not a</td>
+			<td>a false ist.</td>
+		</tr>
+	</table>
+	<!--        Logische Bitwise-->
+	<table>
+		<thead>
+			Neben den numerischen Anweisungen gibt es auch noch bitweise Operator-Anweisungen, welche das
+			Verhalten der einzelnen Bits einer Zahl ändern.
+		</thead>
+		<tr>
+			<th>Name</th>
+			<th>Operator</th>
+			<th>Funktion</th>
+		</tr>
+		<tr>
+			<td>UND</td>
+			<td>a & b</td>
+			<td>Führt für jedes Bit der beiden Parameter a und b die UND-Überprüfung durch.</td>
+		</tr>
+		<tr>
+			<td>ODER</td>
+			<td>a | b</td>
+			<td>Führt für jedes Bit der beiden Parameter a und b die ODER-Überprüfung durch.</td>
+		</tr>
+		<tr>
+			<td>EXKLUSIV-ODER</td>
+			<td>a ^ b</td>
+			<td>Führt für jedes Bit der beiden Parameter a und b die EXKLUSIV-ODER-Überprüfung durch.</td>
+		</tr>
+		<tr>
+			<td>LINKS-Verschiebung</td>
+			<td>a << b</td>
+			<td>
+				Gibt einen Wert zurück, der a entspricht, jedoch alle um b Stellen nach links verschoben (entspricht
+				einer Multiplikation mit 2**b), ist ber wesentlich effizienter.
+			</td>
+		</tr>
+		<tr>
+			<td>RECHTS-Verschiebung</td>
+			<td>a >> b</td>
+			<td>
+				Gibt einen Wert zurück, der a entspricht, jedoch alle um b Stellen nach rechts verschoben
+				(entspricht einer Division mit 2**b), ist ber wesentlich effizienter. Dabei werden alle Bits, die
+				über den rechten Rand hinaus gehen, gelöscht.
+			</td>
+		</tr>
+		<tr>
+			<td>NEGIERUNG</td>
+			<td>!a</td>
+			<td>Dreht alle Bits von a um.</td>
+		</tr>
+	</table>
+	<h2 id="operator-expressions">Operator-Anweisungen</h2>
+	<p>
+		Operator-Anweisungen sind Operatoren mit anschließender Zuweisung, und somit eine Kurzschreibweise der
+		Kombination zweier Operatoren.
+	</p>
+	<table>
+		<tr>
+			<th>Name</th>
+			<th>Operator-Anweisung</th>
+			<th>Funktion</th>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a += b</td>
+			<td>Zu der Variable a wird b addiert</td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a -= b</td>
+			<td>Von a wird b subtrahiert</td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a *= b</td>
+			<td>a wird mit b multipliziert</td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a /= b</td>
+			<td>a wird durch b geteilt</td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a %= b</td>
+			<td>Der Rest, der bei einer Ganzzahldivision von a mit b rauskommt, wird in a gespeichert</td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a **= b</td>
+			<td>a wird b-mal mit sich selbst multipliziert</td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a++</td>
+			<td>Kurzform für <code>a += 1</code></td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a--</td>
+			<td>Kurzform für <code>a -= 1</code></td>
+		</tr>
+	</table>
+	<!--        Bitwise-->
+	<table>
+		<tr>
+			<th>Name</th>
+			<th>Operator-Anweisung</th>
+			<th>Funktion</th>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a &= b</td>
+			<td>Führt für jedes Bit der beiden Parameter a und b die UND-Überprüfung durch, und speichert das
+				Ergebnis in a.
+			</td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a |= b</td>
+			<td>Führt für jedes Bit der beiden Parameter a und b die ODER-Überprüfung durch, und speichert das
+				Ergebnis in a.
+			</td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a ^= b</td>
+			<td>Führt für jedes Bit der beiden Parameter a und b die EXKLUSIV-ODER-Überprüfung durch, und speichert
+				das Ergebnis in a.
+			</td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a <<= b</td>
+			<td>verschiebt die Bits von a um b Stellen nach links (entspricht einer Multiplikation mit 2**b), ist
+				aber wesentlich effizienter.
+			</td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>a >>= b</td>
+			<td>Verschiebt die Bits von a um b Stellen nach rechts (entspricht einer Division mit 2**b), ist aber
+				wesentlich effizienter.
+			</td>
+		</tr>
+	</table>
+	<p>
+		Operatoren habe eine bestimmte Priorität, in welcher sie ausgeführt werden, und einige werden von links nach
+		rechts, andere von rechts nach links ausgeführt.
+		Die folgende Liste zeigt, in welcher Reihenfolge Operatoren vom Compiler beachtet werden. Die höchste
+		Priorität steht zu erst.
+	</p>
+	<table>
+		<tr>
+			<th>Kategorie</th>
+			<th>Operatoren</th>
+			<th>Richtung</th>
+		</tr>
+		<tr>
+			<td>...</td>
+			<td>...</td>
+			<td>...</td>
+		</tr>
+	</table>
+	<h2 id="if">Abfragen und Bedingungen</h2>
+	<p>
+		if-Abfragen sind Codeblöcke, die nur ausgeführt werden, wenn eine Bedingung erfüllt wird.
+		Eingeleitet werden sie mit dem Schlüsselwort <code>if</code>, worauf in normalen Klammern ein Boolescher
+		Wert,
+		oder ein Boolescher Ausdruck folgen muss.
+		Ein Boolescher Ausdruck ist hierbei entweder ein Vergleich, oder ein Pointer, der automatisch auf null
+		geprüft wird.
+		Nach einer if-Abfrage und der darauffolgenden Anweisung kann das Schlüsselwort <code>else</code> folgen,
+		dessen
+		Anweisungen nur ausgeführt werden, wenn die Bedingung der vorigen if-Abfrage nicht erfüllt wird.
+		Anweisungen können in geschweiften Klammern zusammengefasst werden.
+	</p>
+	<pre>
+            if ( a == b ) {
+                Anweisung1()
+                Anweisung2()
+            }
+
+            if ( c ) Anweisung1(); else Anweisung2()
+        </pre>
+	<!--        ?:-->
+	<p>
+		Kurzformen sind praktisch. Eine bereits auch in anderen Programmiersprachen weit verbreitete Kurzform einer
+		if-Abfrage ist der Auswahloperator. Hierbei wird ein Wert zurückgegeben, wenn eine Bedingung erfüllt ist.
+		nach der Bedingung wird einfach ein Fragezeichen gesetzt, auf das dann der Wert folgt, der zurückgegeben
+		werden soll, falls die Bedingung erfüllt wurde, dann ein Doppelpunkt und der zurückzugebende Wert, falls die
+		Bedingung nicht erfüllt wurde.
+	</p>
+	<pre>
+            # Wenn a == b, ist x dann c, andernfalls d. Hier mit klammern verdeutlicht
+            var x = (a == b ? c : d)
+
+            # auch ohne Klammern legitim
+            var x = a == b ? c : d
+        </pre>
+	<!--        ||null-Überprüfung-->
+	<p>
+		Ene weitere Kurzform überprüft einen Pointer auf null. Man schreibt den Pointer, dann den Sonst-Operator
+		<code>||</code> und danach den Wert, der zurückgegeben werden soll, falls der vorige Pointer null war.
+		Um die Dinge noch kürzer zu machen, kann man, wenn es um <a href="#maps">Maps</a> geht, folgendes
+		machen.
+		Sei "a" eine map beliebigen Typs mit den Attributen "b" und "c". Wird nun b auf null überprüft, ist es
+		nach dem Sonst-Operator nicht mehr notwendig, a noch einmal zu erwähnen, sondern es kann mit ".c"
+		direkt weitergehen. Diese Schreibweise entspricht (a.b == null? a.c: a.b)
+	</p>
+	<pre>
+            var x = a || b      # Wenn a null ist, ist x = b
+            var x = a.b || .c   # Wenn a.b null ist, ist x = a.c
+        </pre>
+	<h2 id="loops">Schleifen</h2>
+	<p>
+		Schleifen wiederholen Codeblöcke, solange eine Bedingung erfüllt ist.
+		Die verschiedenen Schleifen sind hier aufgeführt.
+		Auch hier können wieder mehrere Anweisungen nach der Bedingung durch geschweifte Klammern zusammengefasst
+		werden.
+	</p>
+	<section>
+		<h3>While-Schleife</h3>
+		<p>Die while-Schleife führt den Code so lange aus, wie die Bedingung erfüllt ist.</p>
+		<pre>
+                while( a == b ) Anweisung()
+            </pre>
+	</section>
+	<section>
+		<h3>Do-While-Schleife</h3>
+		<p>
+			Die do-while-Schleife führt den Code so lange aus, wie die Bedingung erfüllt ist, jedoch immer
+			mindestens einmal.
+		</p>
+		<pre>
+                dowhile( a == b ) Anweisung()
+            </pre>
+	</section>
+	<section>
+		<h3>For-Schleife</h3>
+		<p>
+			Die for-Schleife führt den Code so lange aus, wie die Bedingung erfüllt ist.
+			In ihrem Kopf werden drei Anweisungen angegeben. Die erste wird ausgeführt, wenn die Schleife das erste
+			Mal ausgeführt wird, die dritte bei jedem Beenden eines Durchlaufs. Die Bedingung ist die zweite
+			Anweisung.
+			Anweisungen können auch weggelassen werden, wenn sie nicht benötigt werden. Die Semikola müssen jedoch
+			stehen bleiben.
+		</p>
+		<pre>
+                for (var i = 0; i < b; i++) Anweisung()
+                for (;a == b;) Anweisung()
+            </pre>
+		<p>
+			Die zweite Variante, eine for-Schleife zu nutzen ist, ihr einfach nur einen <code>int</code> zu
+			übergeben.
+			Dann werden alle Anweisungen exakt so viele Male ausgeführt.
+		</p>
+		<pre>
+                for(5) Anweisung()
+            </pre>
+	</section>
+	<section>
+		<h3>Do-While-Schleife</h3>
+		<p>
+			Die do-while-Schleife führt den Code so lange aus, wie die Bedingung erfüllt ist, jedoch immer
+			mindestens einmal.
+		</p>
+		<pre>
+                dowhile( a == b ) Anweisung()
+            </pre>
+	</section>
+	<h2 id="arrays">Arrays</h2>
+	<p>
+		Arrays sind Datenstrukturen, die mehrere Werte des gleichen Typen enthalten. Man kann sie als einfache
+		Listen ansehen, oder als Vektoren der Mathematik, da mit ihnen genau die gleichen arithmetischen Operationen
+		durchgeführt werden können wie mit mathematischen Vektoren.
+	</p>
+	<p>
+		Erstellt werden Arrays über das Schlüsselwort <code>arr</code>, auf welches dann der Name des Arrays folgt,
+		dann der (möglicherweise abstrakte) Datentyp und letztendlich die Anzahl an Elementen, die maximal drin
+		gespeichert werden können soll, also quasi die Größe des Arrays. Falls diese anfangs nicht bekannt sein
+		sollte, kann stattdessen auf eine komplexere <a href="#datastructures">Datenstruktur</a> zurückgegriffen
+		werden, bei welcher die Größe flexibel ist, die dafür aber natürlich auch mehr Speicher in Anspruch nehmen.
+		Alle Elemente eines leeren Arrays haben den in der <a href="#datatypes">Datentyp-Definition</a> festgelegten
+		Standardwert. Bei Pointern ist es null.
+	</p>
+	<p>
+		Auf Array-Elemente kann mit einem Index zugegriffen werden. Dazu schreibt man den Namen des Arrays, dann in
+		eckigen Klammern den Index (natürliche Zahl, Indizes starten bei 0).
+		Sollte der Index genauso groß sein, wie die Länge des Arrays, wird eine
+		ArrayIndexOutOfBounds-<a href="#exceptions">Exception</a> geworfen.
+	</p>
+	<pre>
+            arr mein_array string 6
+            arr dein_array ptr&lt;int> 42
+            var x = dein_array[0]
+        </pre>
+	<!--        Anonyme Arrays-->
+	<p>
+		Anonyme Arrays sind Arrays ohne Namen, die ausschließlich als Parameter übergeben werden können. sie werden
+		durch die folgende Syntax erstellt. Da sie keinen Namen besitzen, ist es dem Programmierer nicht möglich,
+		sie in dem Aktionsradius (z.B. der Funktion) nach der Erstellung anzusprechen.
+	</p>
+	<pre>
+            [string "", ""]
+        </pre>
+	<p>
+		Anonyme Arrays können allerdings auch genutzt werden, um ein Array direkt zu initialisieren. Dazu schreibt
+		man das Schlüsselwort <code>arr</code>, den Namen des Arrays, das Gleichheitszeichen und daraufhin ein
+		anonymes
+		Array, welches zugewiesen werden soll. Die Syntax ist wie folgt.
+	</p>
+	<pre>
+            arr dein_array = [int 1, 5]
+        </pre>
+	<!--        Rechnen mit Arrays-->
+	<p>
+		Mit Arrays kann auch gerechnet werden, jedoch sind die Rechenmethoden eingeschränkt.
+		Der Betrag eines Arrays ist die Wurzel aus den Quadraten der einzelnen Elemente, vorausgesetzt, die Elemente
+		sind alle vom Typen <code>number</code>.
+		Die Kombination durch den Kombinationsoperatoren <code>..</code> erstellt ein neues Array, welches aus den
+		beiden zu kombinierenden Arrays besteht. Da Strings nur eine spezielle Form von Arrays sind, können auch sie
+		durch den Kombinationsoperator zusammengesetzt werden.
+	</p>
+	<section>
+		<h3>Kombination</h3>
+		<pre>
+                [string "ab", "cd", "ef"] .. [string "gh", "ij"]
+                # Ergebnis: [string "ab", "cd", "ef", "gh", "ij"]
+            </pre>
+	</section>
+	<section>
+		<h3>Betrag</h3>
+		<pre>
+                |[int 4, 3]|
+                # Ergebnis: 5
+            </pre>
+	</section>
+	<p>
+		Bei der Addition/Subtraktion zweier Arrays werden die Werte nach ihrem Index addiert/subtrahiert. Sollten
+		die Arrays unterschiedlich groß sein, wird in der Rechnung vom größten Array ausgegangen, und das kleinere
+		Array durch eins der passenden Größe ersetzt, welches dann mit Nullen am Ende aufgefüllt wird.
+	</p>
+	<section>
+		<h3>Addition</h3>
+		<pre>
+                [int 1, 2] + [int 3, 3, -1]
+                # Ergebnis: [int 4, 5, -1]
+            </pre>
+	</section>
+	<section>
+		<h3>Subtraktion</h3>
+		<pre>
+                [int 1, 2] - [int 3, 3, -1]
+                # Ergebnis: [int -2, -1, 1]
+            </pre>
+	</section>
+	<p>
+		Bei skalarer Multiplikation werden alle Elemente des Arrays mit dem skalaren Multiplikator multipliziert.
+		Da sich hier auch nicht die Länge des Arrays nicht ändern kann, kann man auch hier eine direkte Zuweisung
+		machen.
+	</p>
+	<section>
+		<h3>Skalare Multiplikation</h3>
+		<pre>
+                [int 1, 2] * 3
+                # Ergebnis: [int 3, 6]
+                arr mein_array = [int 1, 2]
+                mein_array *= 3
+            </pre>
+	</section>
+	<section>
+		<h3>Skalarprodukt</h3>
+		<pre>
+                [int 1, 2] * [int 3, 3, -1]
+                # Ergebnis: 9
+            </pre>
+	</section>
+	<section>
+		<h3>Vektorprodukt</h3>
+		<pre>
+                [int 1, 2] ** [int 3, 3, -1]
+                # Ergebnis: ...
+            </pre>
+	</section>
+	<!--        Funktionen und Attribute bei Arrays-->
+	<hr />
+	<pre>int length</pre>
+	<span>Die Länge des Arrays. Immer eins mehr als der letzt Index des Arrays.</span>
+	<hr />
+	<pre>fun array.find(fun condition(var element thisType)) bool</pre>
+	<span>Findet das erste Element im Array mit der gegebenen Bedingung, und gibt einen Pointer zu jenem Element
+		zurück.</span>
+	<hr />
+	<pre>fun array.()</pre>
+	<span>Findet das erste Element im Array mit der gegebenen Bedingung, und gibt einen Pointer zu jenem Element
+		zurück.</span>
+	<h2 id="maps">Maps</h2>
+	<p>
+		Maps sind eine andere Form, um Daten zu strukturieren.
+		Sie werden mit dem Schlüsselwort <code>map</code> erstellt, worauf der Name und der
+		<a href="#datatypes">Datentypen</a> folgen.
+		Danach muss eine Zuweisung folgen, sollte der Typ nicht nullable sein. Dabei müssen alle nicht bereits
+		zugewiesenen Werte des map-Typen im map-Design zugewiesen werden.
+		Zunächst wird der Name der zu überschreibenden Variable geschrieben, danach ein Doppelpunkt und der
+		zuzuweisende Wert, welcher den in der Datentypdefinition festgelegten Typen haben muss.
+		Verwirrt? Ich auch.
+		Es können auch noch weitere Werte nach der üblichen Definition ergänzt werden, wobei da allerdings noch
+		angegeben werden muss, ob es sich um eine Variable, Konstante oder Array, usw. handelt.
+		Die Attribute können durch ein Komma voneinander getrennt werden, um sie in einer Zeile schreiben zu können.
+	</p>
+	<pre>
+            map meine_map human?
+            map deine_map human = {
+                name: "Heinz Harald"
+                age: 42, size_in_cm: 180
+                # Es ist immer ratsam, die restlichen, ergänzten Attribute
+                # mit einem Kommentar vom Rest zu abzutrennen.
+                var ist_klug: true
+            }
+            map eineMap human? = {
+                name: ""
+                fun extraFunktion = (){}
+            }
+        </pre>
+	<!--        Zugriff-->
+	<p>
+		Auf die Werte einer Map kann man mit einem Punkt und dann dem Namen des Attributs zugreifen.
+		Jede Map hat automatisch die Attribute "size", "foreach()"
+	</p>
+	<pre>
+            var x = meine_map.attribut
+            var length = meine_map.length
+            meine_map.foreach((element){
+                print("Hallo " .. element)
+            })
+        </pre>
+	<!--        Anonyme Maps-->
+	<p>
+		Anonyme maps sind maps ohne Namen und ohne Datentyp. Sie werden durch geschweifte Klammern erstellt.
+		Sie können als einzige direkt einer map ohne Datentypen zugewiesen werden.
+	</p>
+	<pre>
+            map x = {
+                var name: "Max Mustermann"
+                var age: 43
+            }
+        </pre>
+	<h2 id="functions">Funktionen</h2>
+	<p>
+		Funktionen sind Codeblöcke, die zusammengefasst und vom restlichen (nicht globalen) abgeschlossen werden.
+		Sie werden über das Schlüsselwort <code>fun</code> erstellt, worauf optional der zu erweiternde
+		Datentyp als in Klammern geschriebene Variablendeklaration mit einem Punkt danach und obligatorisch der Name
+		der Funktion folgen. Nach dem Namen stehen in Klammern Variablen, Pointer oder sonstige Parameter.
+		Auch hier muss wieder gekennzeichnet werden, sollte ein Pointer-Parameter nullable sein.
+		Parameter können obligatorisch gemacht werden, indem ein Ausrufezeichen an den Datentypen angehangen wird.
+		Sollte dies bei einem nullable-Pointer sein, ist die Reihenfolge des Fragezeichens und des Ausrufezeichens
+		egal.
+		Optional ist auch die Angabe eines Rückgabewert-Datentypen. Sollte dieser spezifisch abgegeben werden
+		müssen, kann dies durch einen Doppelpunkt nach der Klammer-zu der Parameter und darauffolgend dem jeweiligen
+		Datentypen erfolgen.
+		Danach kann eine neue Funktion definiert werden, indem einfach nur in geschweiften Klammern Anweisungen
+		folgen. Funktionen müssen immer einen Wert zurückgeben. Dieser Wert kann mit dem Schlüsselwort
+		<code>return</code> angegeben werden, ist standardmäßig aber immer 0.
+	</p>
+	<pre>
+            fun (var myCar Car).erweiterteFunktionMitReturnType() : string{
+                doSomething()
+                return "lol"
+            }
+
+            fun meine_funktion(var zahl int!, var name string, ptr pointer int?!){
+                zahl++
+                doSomething()
+                print(name, pointer)
+            }
+        </pre>
+	<p>
+		Funktionen werden durch ihren Bezeichner (ihren Namen) aufgerufen, von Klammern gefolgt, in denen alle
+		nötigen Argumente für die jeweiligen Parameter in der von der Definition vorgegebenen Reihenfolge angegeben
+		werden.
+		Alternativ kann beim expliziten Aufruf auch auf die Reihenfolge verzichtet werden, indem auf einen
+		Parameternamen folgend mit einem Gleichheitszeichen das Argument zugewiesen wird.
+		Alle Parameter, denen kein Argument im Funktionsaufruf zugewiesen wird, werden auf ihren spezifischen in der
+		<a href="#datatypes">Datentyp-Definition</a> festgelegten Standardwert gesetzt. Bei Pointern ist es null.
+	</p>
+	<pre>
+            var x = 5
+            meine_funktion(42, "Thomas Lieven", $x)
+            meine_funktion( name="Heinz Harald", zahl = 42, pointer=null )
+
+            meine_funktion()
+                # ERROR: 'zahl' ist obligatorisch.
+                # ERROR: 'pointer' ist obligatorisch.
+        </pre>
+	<p>
+		Ellipsen-notation wird genutzt, um eine variable Anzahl an Parametern darzustellen. Sie kann ausschließlich
+		beim letzten Parameter einer Funktion angewendet werden, welcher ein Array sein muss.
+		Alle Argumente, die über diese Schreibweise übergeben werden, müssen entweder den gleichen Typen haben, oder
+		werden alle automatisch in string umgeformt.
+	</p>
+	<pre>
+            deine_funktion( var name string, arr zahlen int... ) {
+                print(zahlen.length)
+                print(zahlen[1])
+                doSomething()
+            }
+
+            deine_funktion( "Daniel", 3, 42, 1337, 707)
+                # Die Zahlen können im Code dann als [int 3, 42, 1337, 707] verwendet werden.
+
+            unsere_Funktion(arr werte string...) {
+                print(werte.length)
+                doSomething()
+            }
+
+            unsere_Funktion(3, "Hallo", 42)
+                # wird im Funktionskörper zu [string "3", "Hallo", "42"]
+        </pre>
+	<!--        Anonyme Funktionen-->
+	<p>
+		Anonyme Funktionen, oder auch Lambda-Funktionen genannt, haben keinen Namen. Sie können einer neu erstellten
+		Funktion alternativ zum Codeblock zugewiesen werden. Dazu schreibt man anstatt der geschweiften Klammern ein
+		Gleichheitszeichen und dahinter die Anonyme Funktion. Dabei müssen allerdings die anonyme Funktion und auch
+		die zu erstellende Funktion die gleichen Parameter haben.
+		Erstellt werden anonyme Funktionen durch normale Klammern, in denen alle Parameter mit Kommata getrennt
+		aufgezählt werden, und dann folgt der Codeblock in geschweiften Klammern.
+	</p>
+	<pre>
+            fun deineMap.deineFunktion() = (){
+                return 1
+            }
+
+            fun eineFunktion(fun andere(var x int)) {
+                andere(3)
+            }
+
+            eineFunktion((var x int){
+                x++
+                print("x ist jetzt: ", x)     #  x ist jetzt: 4
+            })
+        </pre>
+	<!--        Code Injection-->
+	<p>
+		In Funktionen kann Code aus anderen Sprachen eingefügt werden. Dazu schreibt man direkt nach der
+		geschweiften Klammer-auf drei <code>`</code>, den Namen der Sprache (eine Liste mit allen unterstützten
+		Sprachen folgt), einen Zeilenumbruch, den Code und schließlich wieder drei <code>`</code>.
+		In geschweiften Klammern können in dieser Code-Injektion Ausdrücke angegeben werden.
+	</p>
+	<pre>
+            fun eineFun(){```js
+                let x = 'hallo'
+                console.log(x)
+            ```
+            }
+
+            # Auch in anonymen Funktionen möglich
+            Anweisung((){```python
+                def einsFunktionLul():
+                    print("Hallo Welt")
+                    return 0
+                einsFunktionLul()
+            ```
+            })
+        </pre>
+	<h2 id="namespaces">Namespaces</h2>
+	<p>...</p>
+	<pre>
+            namespace name {
+                # everything in here is global
+                global {
+                    var dumb = true
+                    ptr useless = $dumb
+                }
+            }
+        </pre>
+	<h2 id="datatypes">Datentypen</h2>
+	<p>...</p>
+	<h2 id="datastructures">Datenstrukturen</h2>
+	<p>...</p>
+	<h2 id="exceptions">Exceptions</h2>
+	<p>...</p>
+</article>

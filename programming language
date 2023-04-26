@@ -1,0 +1,622 @@
+/*
+	Ein Kalkül besteht aus Anweisungen. Anweisungen können Deklarationen, Definitionen, Zuweisungen, und so weiter, bestehen.
+	Ein Programm hat zwei essenzielle Inhalte: Daten, und Anweisungen, wie mit den Daten umgegangen werden soll.
+	
+	Anweisungen werden hier "function" bzw. "command" genannt. Der Unterschied zwischen beiden ist, dass "functions"
+	nur aus den ihnen bereitgestellten Daten lesen können, "commands" allerdings auch Änderungen an den Daten verüben
+	dürfen.
+
+	Daten können alles sein. Ein Datenelement kann eine Zeichenkette sein, eine Zahl, eine Liste, oder eine Karte.
+	Solch ein Element kann variabel oder konstant sein.
+*/
+
+// KONSTANTEN
+// Datentyp Name < Wert
+int x < -15415245475241527452452745245745241257 // Größe wird automatisch angepasst
+nat a < 3 // natürliche Zahl, 0 inklusive
+float test < 3.14159265 // Kommazahl
+unassigned i32 y
+y < 3 // kann nur einmal zugewiesen werden
+y < 2 // FEHLER
+
+// Höhere Datentypen haben als Startwert immer 0 oder sind bei Listen und Strings leer.
+// Anders sieht es bei primitiven Datentypen aus. "int" ist KEIN primitiver Datentyp. "i32" ist es.
+// Diese haben keinen Startwert, sondern bekommen den Wert, der gerade im jeweiligen Speicher steht.
+// Dieses Prinzip macht Berechnungen etwas schneller.
+var int zeroByDefault // Variable => kann neu zugewiesen werden
+var i32 nonZero
+var list empty
+Console#log(zeroByDefault) // 0
+var string y = "Hallo"
+var int x : °A4 + test	// ERROR: Kann keinen float zu einem int addieren
+x : °A4 + int(test) // kein Error mehr, da Neuinterpretation explizit
+
+// Eine Ansammlung an Daten, quasi wie eine fixe Liste, wird Vektor genannt.
+// Vektoren sind immer statisch auf dem Stack, haben eine feste Größe und einen festen Datentypen.
+// Beim Datentypen kommt es wieder darauf an, ob dieser einen Startwert setzt oder nicht.
+// Die Syntax schreibt vor, dass erst der Datentyp genannt wird, der in dem Vektor stehen wird, dann "vec" und optional in
+// Klammern die Größe des Vektors.
+// Durch den Operator "a..b" wird ein Vektor aus Ganzzahlen von a bis b gebildet.
+// Der Index eines Vektors kann ein solcher Ganzzahlvektor sein. Dadurch werden alle Elemente an den Stellen zurückgegeben, welche
+// durch den Indexvektor als Indizes angegeben werden.
+int vec(2) filledWithZeroes
+i32 vec(2) filledWithRandomStuff // z.B. [int 42, 69, 1337]
+vec automatic1 = [i64 0, 2, 1] // Die Art und Größe des Vektors wird automatisch erkannt
+vec automatic2 = 0..2 // äquivalent zu "vec automatic2 = [i64 0, 1, 2]"
+Console:log(filledWithRandomStuff[automatic]) // [int 42, 1337, 69]
+filledWithZeroes[0] = 5
+Console:log(filledWithRandomStuff[0..2]) // [int 5, 69, 1337]
+// Vektoren können auch aus mehreren Vektoren bestehen (was einer Matrix gleich kommt)
+// Bei Matrizen (mehrdimensionalen Vektoren) wird erst die Anzahl an Zeilen, dann die Anzahl
+// an Spalten genannt.
+string vec(4) vec(3) Vektor
+
+// Namensräume werden mit Doppelpunkten anstatt normaler Punkte hierarchisch beim Importieren getrennt.
+// Sollte man den Import umbenennen wollen, kann man das mit "as" tun.
+import cq:Window as Wd
+import Namespace from "../Datei1.cq"
+import Namespace from "./Datei2.cq" // ERROR, da bereits ein Namespace dieses Namens vorhanden ist
+
+// Funktionen werden mit dem Schlüsselwort "fnc" erstellt.
+// Parameter werden weder nach Referenz, noch nach Wert übergeben. Es wird der Existenzbereich des Speicherstücks
+// auf die Funktion ausgeweitet. Somit wird kein weiterer Speicher für eine Funktion erstellt.
+// Variablen können als Konstanten übergeben werden, andersrum nicht.
+// Funktionen haben immer nur einen Sinn und können keinen der Parameter verändern, sondern nur lesen und zurückgeben.
+// Funktionen dürfen keine Nebeneffekte haben, aber auch aus globalen Speicherbereichen lesen.
+fnc test {} // automatischer Rückgabewert "void"
+fnc void test{}
+fnc void test(int constParam){}
+fnc void test(var int varParam){} // ERROR: "var" nicht in Funktionen möglich!
+
+// Befehle sind Funktionen, die Parameter verändern können, oder/und Nebeneffekte haben dürfen.
+cmd test {} // muss Nebeneffekte haben, da kein Parameter zu ändern vorhanden ist
+cmd void test{} // muss Nebeneffekte haben, da kein Parameter zu ändern vorhanden ist
+cmd void test(int constParam){} // Parameter ist nicht veränderlich -> Nebeneffekt ist Muss
+cmd void test(var int varParam){} // varParam kann verändert werden
+// Sie geben immer ein "Result"-Objekt zurück. In diesem enthalten sind:
+// - ok (bool)
+// - t (type)
+// - value (t of type)
+// - err (error)
+
+// Rückgabewerte von Funktionen und Befehlen können auch Tupel sein.
+// Die gesamte Error-Verwaltung basiert auf diesem Prinzip. Errors müssen behandelt werden.
+// ungenutzte Error-Variablen werden immer einen Compiler-Fehler verursachen
+fnc (int, Error) (int succeed).test(int count){
+	if(succeed =? Limit:Int) return (0, Error)
+	else succeed+=count
+	return succeed
+}
+
+
+//  Schleifen und Anweisungen: ähnlich wie in Java
+// 'a "nicht a (wenn a ein bool ist)"
+// a =? b "Sind a und b gleich?"
+// a '? b "Sind a und b ungleich?"
+// a <? b "Ist a kleiner als b?"
+// a >? b "Ist a größer als b?"
+// a <=? b "Ist a kleiner gleich b?"
+// a >=? b "Ist a größer gleich b?"
+// a ? b : c "Wenn a wahr ist, gib b zurück, ansonsten c"
+// a =! b "a und b müssen gleich sein, oder das Programm stoppt"
+if (true) {}
+if (true) {} else {}
+if (true) {} else if (true) {} else {}
+if( a =? b =? c) {} // führt nur aus, wenn a, b und c gleich sind
+
+for( var int i = 0; i <? 9; i++ ){}
+while( true ){}
+do while( true ){}
+do{} // macht nichts, außer einen neuen Anwendungsbereich zu eröffnen
+for ( char c of myString ){} // führt die Schleife einmal pro Zeichen im String durch
+for ( any ref reference of myList ){} // führt die Schleife einmal pro Element in der Liste durch
+for ( var int x <? 10 ) // führt die Schleife genau 10mal aus. Hierbei wird der Startwert des Zählers immer auf 0 gesetzt
+
+
+// Vektoren und primitive Datentypen sind auf dem Stack, sowie statische Strings und Listen
+string str = "Hallo" // Stack
+list str = ["Hallo", "Welt", 42] // Stack
+var list str = ["Hallo", "Welt", 42] // Stack, da Listen immer verkettet sind, und angehängte Werte auf den Heap kommen können
+var string str = "Hallo" // Stack, da angehängte Werte auf den Heap kommen können:
+// UTF-8-Strings beginnen immer wie folgt:
+// 0xxxxxxx								=> ASCII-char
+// 110xxxxx 10xxxxxx					=> Zwei Bytes lang, jedes folgende Byte muss mit 01 beginnen
+// 1110xxxx 10xxxxxx 10xxxxxx			=> Drei Bytes lang, ...
+// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx	=> Vier Bytes lang, ...
+// Danach ist Schluss. UTF-8 lässt nur bis zu 4 Bytes zu, also demzufolge (abzüglich der "10" am Anfang jedes anderen Bytes) nur 2^21 Zeichen.
+// Jeder variable String in CQ endet mit "~111110xx" und darauffolgend ein Pointer zu der nächsten Zeichenkette, die diesem String
+// angehört, aber in einem anderen Bereich des RAM steht.
+
+
+// Pointer sind implementationsabhängig große Datentypen, die auf einen Bereich im Speicher zeigen.
+// Referenzen sind Objekte, die einen Pointer und einen Wert besitzen, sowie über den Datentypen des Speichers wissen, auf den der
+// Pointer zeigt.
+int a = 42
+int ref refToA = refto a
+ptr ptrToA = @a
+refToA.pointer =! ptrToA
+refToA.datatype =! int
+refToA.value =! 42
+
+struct Reference {
+	type datatype
+	§datatype ptr pointer // Das Paragraphen-Zeichen symbolisiert, dass der Datentyp interpretiert werden soll
+	§datatype value = autocall (){resolve(pointer)} // ruft die Funktion automatisch auf, wenn "value" aufgerufen wird
+}
+
+// Referenzen können standardmäßig nicht "nix" sein, aber sogenannte "Optionale" können das.
+// Optionale sind Referenzen, die auch "nix" beinhalten können, also deren Pointer auf \0 zeigt.
+int a
+int ref something = refto a
+int opt optional = nix
+opt alsoOptional = nix
+optional.pointer =! 0
+
+// Referenzen zu Referenzen sind auch möglich:
+int a = 42
+int ref b = refto a
+int ref ref c = refto b
+c.value =! b =! refto a
+c.pointer =! @b
+b.pointer =! @a
+b.value =! a
+
+// Dateien werden mit dem FILE-Objekt
+// File steht hierbei als typedef für "opt(FILE)"
+File f = cq:io:fs:open("./test.txt")
+if (f exists) {
+	vec bytes = f.read()
+	string 
+}
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Multithreading:
+  Threads können wie in Java entweder über `extends Thread` oder über anonyme Klassen erstellt werden. Hierbei müssen in jedem Fall die
+   `load()`- und die `tick()`-Methode überschrieben werden. `load()` wird beim Starten des Threads einmalig ausgeführt, `tick()` dauerhaft.
+   Gestartet werden Threads durch `thread.start()`, beendet durch `thread.close()`. Man kann auf die Fertigstellung eines Threads immer mit
+   `thread.await()` warten, oder vor die Start-Methode ein `await` setzen (Sinn? Keine Ahnung.)
+
+
+
+
+Um Text vor dem Compilen zu ersetzen, kann man "define" verwenden. Im Gegensatz zu "const" ist define nur
+eine Ersetzung, also ist der Datentyp vollkommen Wurst.
+
+synchronized {}
+synchronized () {}
+
+Variablen sind nicht gleich ihrem Wert. In CQbd wird eine Variable bzw. ihre Referenz/Pointer mit dem
+Variablennamen angegeben, ihr Wert jedoch mit einem "\$variablenName".
+
+
+In einem Block kann ein Namespace dauerhaft angesprochen werden, was besonders nützlich für Webentwicklung ist. Sollte man dies in einem Objekt-Kontext verwenden, muss bei jeder Objekt-Methode ``this.`` davorgesetzt werden.
+
+Referenzen sind in CQbd ein eigener Typ, also weder Objekt, noch Variable, noch Array oder Funktion. Sie werden als "ref" angegeben. Syntax: ```ref name = eine_Variable_oder_sonst_was_xD```
+
+
+switch-case soll viel einfacher und logischer sein als in C. Die Syntax sieht wie folgt aus:
+  ```
+  switch(<variable>){
+    case(<value>) expr()
+    case(<value>){
+      expr()
+      expr()
+      case(<value>)
+    }
+    default expr()
+  }```
+Man kann also auch aus einem case heraus einen anderen Case ansprechen, wie man auch eine function ausführen würde.
+Oprional kann nach der Variable im switch()-Kopf eine function-Referenz angegeben werden (z.B. "TYPE::equals"), mit der die Variable geprüft werden soll.
+  Syntax: ```switch(<variable>, TYPE::equals){/*...*/}```
+
+
+Ein Pointer soll standardmäßig nicht null sein können, außer, sein Typ wird mit einem Fragezeichen angegeben. Syntax:
+  ```pointer p string?``` bzw. ```pointer p string? = "Hallo"; p = null```
+
+Bei einem typedef kann als Attribut "returns" angegeben werden, mit einer bereits erstellten Variable dahinter, die quasi der Standardwert sein soll. Dadurch wird verhindert, dass immer wieder sowas wie eine ".value()"-Methode aufgerufen werden muss, falls ein type wie eine Erweiterung eines anderen gewertet werden sollte.
+
+
+2°3 steht für 2 * 10**3
+math:e ist die Eulersche Zahl
+math:pi ist PI
+
+Anstatt mehrmals mit =! vergleichen zu müssen, kann man auch die im type-Namespace vorhandene "equals(...)"-Methode verwenden, die beliebig viele Parameter entgegennimmt, und alle überprüft, ob sie mit der Ursprungs-variable übereinstimmen.
+Überschreibbare Operatoren in einer Typdeklaration:
+    a =! b
+    |a|
+
+```operator =!(type other){}```
+
+Andere Sprachen können über drei ` als Code-String eingefügt werden. Eine Liste mit allen unterstützten Sprachen liegt vor.
+Code aus anderen Sprachen kann in anonyme Funktionen eingefügt werden. Syntax:
+    (){```js
+               let x = ''
+               document.getElementById('hallo')
+       ```}
+Der Exit-Code des Programms ist auch der Rückgabewert der anonymen Funktion.
+
+
+Namespaces und Typen können auch die gleichen Namen haben. Kann aber verwirrend sein...
+
+namespace Window {
+	typedef Window struct{
+		var name string
+		fnc doSomething(){
+			console.log("Hello")
+		}
+	}
+
+	fnc foo(){
+		console.err("Oh no")
+	}
+}
+
+Window::foo()			// output "Oh no"
+var window Window::Window = {name: "My Window"}
+window.doSomething()	// output "Hello"
+
+using Window
+foo()					// output "Oh no"
+var window Window = {name: "My Window"}
+window.doSomething()	// output "Hello"
+
+operator get(VARIABLE) {
+	return VARIABLE || "lol"
+}
+operator set(VARIABLE, WERT){
+	VARIABLE = WERT || "alternativer Wert xD"
+}
+
+
+
+string:
+	bis zur ersten 0 werden alle Einsen gezählt, das ist die Länge der Länge des Strings
+	Wenn die Länge der Länge = 0, ist die Länge 1 (nur ein Ascii-Character)
+	0xxxxxxx -> ASCII
+	10______ xxxxxxxx ... -> UNICODE-Zeichenkette mit ______ vielen Charactern (xxxxxxxx)
+	11000001 00000001 xxxxxxxx ... -> String mit 257 Zeichen (257mal xxxxxxxx)
+
+
+
+
+
+
+
+
+
+
+var x int
+x : 32
+if(x = 32)
+
+
+fnc test : (var x string){
+	Console::log()
+}
+
+
+
+
+
+
+
+
+fnc main(arr(string) args, map(string, string) env){
+
+}
+
+import NAMESPACE from URL
+ifdef NAMESPACE {}
+
+https://www.youtube.com/watch?v=74_7LrRe5DI
+
+nand-operator: !&
+
+~ steht für binär
+# steht für hexadecimal
+
+
+
+`const` meint, dass der exakte Wert in der Speicheradresse der Variable nur einmal gesetzt werden kann.
+`final` meint, dass der Wert der Variable oder des Pointers konstant bleibt
+
+[]..[] kombiniert zwei arrays/Listen
+1...42 erstellt ein Array mit Zahlen von 1 bis 42 (beides inklusive)
+...42 erstellt ein Array aus den Zahlen 0 bis 42 (beides inklusive)
+1... erstellt einen Iterator (eine Variable, die wie ein Array funktioniert, aber erst zur Laufzeit errechnet wird), der von 1 bis zum (veränderlichen) Iterator::Maximum geht.
+Ein Iterator ist ein Array, das nur einen Eintrag enthält, und dessen aktueller Wert erst zur Laufzeit berechnet wird
+[]...[] erstellt ein zweidimensionales Array aus den beiden vorhandenen Arrays
+arr[2:8] gibt ein array mit den Elementen 2 bis 8 aus arr zurück
+
+
+Jegliche Art von Variablen/Pointern/Arrays/Maps, die nicht konstant sind, müssen, sollten mehrere Threads darauf
+zugreifen wollen, entsprechend gekennzeichnet werden. "shared" ist hierbei das Schlüsselwort.
+Das bewirkt, dass das Stück Speicher immutable wird.
+
+variable.function() // die Variable kann verändert werden
+function(variable) // die Variable kann nicht verändert werden
+
+
+fnc returnIncremented(var x int) -> int
+fnc returnIncremented(var x int){
+	return x + 1
+}
+
+fnc (var x int) increment -> void | error
+fnc (var x int) increment{
+	x = x + 1
+}
+
+
+
+fnc test(){
+		if( anything ) return Exception(Result::NotFound, "Could not find what you searched for lol")
+		else return 1
+}
+var result = test() // ERROR: unhandled exception
+var (result, error) = test()
+
+
+null in CQbd ist `void`
+
+fnc íst eine Funktion, die niemals auf globale Variablen zugreifen kann, und keinen Parameter verändern kann.
+trf ist eine Transformation, die beides darf und kann.
+
+struct Map {
+  let mapType Type // muss bei der Initialisierung übergeben werden
+  ref otherType Type // muss nicht übergeben werden, kann später gesetzt werden
+  mapType variable1
+  mapType variable2
+  otherType pointer1
+  otherType pointer2
+}
+
+Funktionen, die nur einmal aufgerufen können werden sollen, werden mit dem Schlüsselwort "once" versehen.
+once doThis{
+  // do only once
+}
+once doOther(var x int){
+
+}
+
+
+Compiler-extensions über eine spezielle API lassen Sourcecode vor der Kompilierung in LLVM-Zwischencode bearbeiten, sodass Macros unnötig werden
+
+number --> ist eigentlich ein Pointer, der auf einen anderen Speicherbereicht zeigt, auf dem dann die Zahl steht. Wird ein Pointer zu dieser number gemacht,
+ist das letztendlich nur ein Pointer zu einem Pointer.
+
+[int 0 7 8] = [int 0,7,8] = Array aus drei Ganzzahlen
+[f64 3 5.6 π] = Array aus drei 64-Bit-Gleitkommazahlen
+[number 8.5, 42, 1337] = Array aus sich selbst an ihre Größe anpassenden Zahlen (nur Pointer zu jenen Zahlen)
+[5 4 7.42] = verlinkte Liste --> Jedes einzelne Element: {var type type, var value .type, ref next Element}
+
+
+42   is f32      // true
+42.0 is f32      // true
+42.0 is i32      // false
+42 is number     // true
+42.0 is number   // true
+i32 is number    // true
+string is number // false
+
+
+Async-Await ist in vielen Sprachen (JS, C#, ...) ein beliebtes Prinzip, mich nervt es aber nur.
+Man endet darin, alle Funktionen async zu machen, überall await hinzuschreiben, und am Ende auch die main-Funktion
+async zu machen, damit die ganzen Rufe an die API getätigt werden können und das Ergebnis im Main-Thread genutzt werden kann.
+Anstatt also Funktionen quasi grundsätzlich async zu machen, soll der Sprachnutzer volle Kontrolle über seine Threads haben.
+In CQ heißen sie allerdings "Task"s und werden wie folgt erstellt:
+let Task("name", *data) meineAufgabe : (){ Console::log("Hallo"); return 0 }
+task.then((){
+	Console::log("fertig")
+})
+task.catch((){
+	Console::err("error")
+})
+let (result, error) : task.await() // wartet auf die Fertigstellung der Aufgabe und speichert den Rückgabewert in `result`.
+task.kill() // Tötet die Aufgabe
+
+fnc doFetch(...){...} // Sei doFetch eine Funktion, die aus dem Internet Daten zieht
+async doFetch() // So kann die Funktion asynchron ausgeführt werden. Einzige Ausnahme:
+fnc noasync notAsync(...){...} // kann nicht asynchron ausgeführt werden
+
+
+Typen können entweder als Kompilierzeit-Typen oder als Laufzeit-Typen definiert werden.
+type mytype {/* ...*/}
+typeR mytype_on_runtime {/* ...*/}
+Laufzeit-Typen werden immer auf den Heap gelegt, da sie nicht auf den Stack passen.
+Man kann sie jedoch als Variablen verwenden, und ihren Typen überprüfen, wie jede andere Variable auch.
+
+
+// Alle Variablen und Funktionen sind standardmäßig privat.
+public				// überall, nur Lesezugriff
+public mutable		// überall, aber Parameter können verändert werden (nur bei Objekten)
+public replaceable 	// überall, gesamter Wert kann verändert werden
+
+
+Die Dokumentation der Sprache erfolgt in Markdown. Das wird dann über einen HTML-Konverter auf dem Server gerendert und an den Nutzer geschickt.
+Dokumentationen ansonsten werden direkt aus den Kommentaren der Funktionen generiert. Hierbei wird auch Markdown verwendet,
+der über selbiges Prinzip wieder gerendert wird.
+
+Der Editor, in dem geschrieben wird, unterstützt eine API, welche neue Fenster erstellen kann, die dann über localhost miteinander kommunizieren.
+So kann jeder Entwickler seine komplett eigene Nutzergrafik erstellen und den Editor damit steuern.
+
+Klassen sind in CQbd nur Beschreibungen des Seins, nicht aber des Tuns. Man beschreibt in einer Klasse nur, welche Attribute das Objekt
+haben soll, nicht aber, welche Methoden es verändern können.
+
+namespace Human {
+
+	class {
+		var age natural // automatisch nur in dem namespace verfügbar
+		var name string
+	}
+
+	transform Human hu {
+		public talk // hat keine Argumente
+		alter(cst amount int)
+	}
+}
+
+
+In Funktionen kann man angeben, dass eine andere Funktion in dem gleichen Aktionsbereich ausgeführt werden muss.
+so etwas wie `will functionName`
+
+Man kann neue Datentypen mit "typedef" definieren.
+typedef name extends/subtype {...}
+typedef int extends byte[SIZE] {
+
+}
+typedef native i32;
+typedef native i64;
+
+let abc element string
+
+Neben Referenzen und Werten kann man einer Funktion auch den Besitz einer Variable direkt übergeben.
+Dadurch wird der Anwendungsbereich der Variable auf die Funktion ausgeweitet.
+Welche Variable das ist, muss allerdings zur Kompilierzeit bekannt sein. Nützlich kann das in Rekursionen sein, bei denen
+man eine Zählervariable mitgibt. Diese muss dann nicht pro Aufruf neu erstellt werden, sondern die Referenz wird einfach übernommen.
+Das vermindert die Speicherbelastung während der Laufzeit.
+
+
+// so etwas geht auch als Typendeklaration
+typedef test : fnc void (let [string], let [string]);
+test (args, env) {
+	// ...
+}
+
+Man kann durch das Sprachpaket in VSCode bzw Fleet bzw Was-auch-immer dann zB @dotp schreiben, und das jeweilige Zeichen wird direkt
+eingesetzt.
+
+Operatoren können als Funktionen übergeben werden. Zum Beispiel wenn eine Funktion als Parameter zum Vergleichen zweier Werte
+erwartet wird, und man den kleineren haben will:
+(3, 4).compare(<)
+resultiert in:
+3
+weil 3 kleiner als 4 ist.
+fnc (let int a, let int b).compare(fnc callback -> bool) -> int {
+  if (callback(a, b)) return a;
+  else return b;
+}
+bzw.
+fnc (let int a, let int b).compare(fnc callback -> bool) -> int: callback(a, b) ? a : b;
+
+
+Das Schlüsselwort "operation(PARAMETER)" gibt einer Funktion Zugriff auf einen Teil des Kodexanalysebaums (parsing tree).
+Damit kann ein Parameter darauf überprüft werden, eine komplexere Operation zu sein. So kann die Logarithmus-Funktion
+über Logarithmengesetze eine Beschleunigung der Laufzeit mit sich ziehen:
+fnc ln -> float (float number){
+	if(operation(number)){
+		let op = operation(number);
+		if (op is operation::division) return ln(op.dividend) - ln(op.divisor)
+	}
+	// ...
+}
+
+Referenzen sind grundsätzlich nicht veränderlich. Will mann, dass der Wert einer Referenz geändert werden kann, muss man
+das Schlüsselwort "mut" davor schreiben.
+var int a = 0; // ist a nicht variabel, kann auch eine Referenz nichts daran ändern
+ref b = a;
+b = 3; // ERROR, da b nicht als "mut" deklariert wurde
+mut ref c = a;
+c = 42; // a und c sind nun 42
+
+
+Es gibt verschiedene Arten von Errors:
+- Fault ist ein kritischer Fehler, der das Programm stoppt.
+- Warning ist nur eine Warnung über zum Beispiel eine Aufgabe, die nicht explizit beendet wurde.
+
+Listen kümmern sich nicht um den Datentypen, der in ihnen gespeichert wird (im Gegensatz zu Arrays).
+Der Datentyp des Elements wird neben dem Element gespeichert.
+list l;
+l <- 5 // 5 wird an die Liste angehängt
+
+continue aus C ist hier "skip"
+
+Rückgabewerte müssen immer behandelt werden. Will man das nicht tun, schreibt man "ignore" davor.
+ref r = getSomeRef(); // ok
+getSomeRef(); // nicht ok
+ignore getSomeRef(); // ok
+
+
+**Heap-Referenzen**
+var string s = malloc(string, 1, true); // malloc(dataType, amount, setToZero); reserviert Speicher auf dem Heap
+var string s2 = s; // geht nicht, da s auf dem Heap ist.
+var string s2 = refto s // geht
+s2 = "xD" // "xD" wird in den Speicher von s geschrieben
+var string s3 = move s;
+
+
+
+Speicherbereiche gehöre immer einem Thread. Sie können aber auch manuell verschoben, aber ausschließlich lesend geteilt werden.
+
+CQ hat zwei verschiedene Dateitypen: cq, cqh.
+cq symbolisiert reinen Kalkül, welcher ausschließlich Funktionsdefinitionen, Namensraumerweiterungen und Importe haben darf.
+cqh ist der sogenannte "Header", wo Funktionen deklariert, aber nicht definiert werden dürfen. Außerdem werden dort
+Datentypen definiert. In Namensräumen können auch globale Variablen definiert werden, dürfen aber nicht nur deklariert werden.
+
+"extern" vor einer Funktionsdeklaration beschreibt, dass die Funktion außerhalb des eigenen Kalküls definiert ist. Das kann
+beispielsweise eine statische oder eine geteilte Bibliothek sein, oder bereits kompilierter LLVM-Kalkül.
+
+:: ist ebenfalls eine Möglichkeit, Kommentare zu machen. Diese Kommentare aber gehören zur Dokumentation der Funktion.
+
+
+% heißt "durch 100"
+
+Sollte ein Vektor mit einer Variable indiziert werden, muss sichergestellt werden, dass der Index kleiner als die Größe des
+Vektors ist. Entweder dies wird durch vorherige Überprüfung (if-else) gelöst, oder durch Beschränkung der Index-Variable auf
+einen Wertebereich. (Siehe Typendefinition)
+
+Formatierte Strings:
+f"{myData}"
+
+Gibt eine Funktion einen Wert zurück, muss dieser Wert behandelt werden.
+returns42(); // FEHLER: Rückgabewert "nat" wurde nicht behandelt.
+nat r = returns42(); // Ok.
+ignoreReturn returns42(); // Ok.
+
+
+Funktionen können auf ein Objekt angewandt werden:
+Objekt o {
+	cmd test() bool {
+		return o.isNice
+	}
+}
+
+Paketverwaltung:
+	Mal ganz davon abgesehen, ob Pakete global, pro Nutzer, oder Pro Ordner installiert werden sollten...
+	Der Pakete-Ordner enthält:
+		- include/ (Header-Dateien, die Typdefinitionen Funktionsdeklarationen,... enthalten)
+		- lib/
+			- static/ (Bibliotheken, die direkt in das Programm kompiliert werden können/sollen)
+			- dynamic/ (dynamische Bibliotheken, die zur Laufzeit verlinkt werden)
+		- source/ (Der Quellcode)
+		- compile.cqnt (Liste an Abhängigkeiten sowohl für die Laufzeit als auch für die Kompilierung)
+		- compile.cq (Anweisungen, wie kompiliert werden soll)
+	Jedes Paket kann durch den Quellcode immer eigenständig neu-kompiliert werden.
+
+
+Datenelemente wird immer ihr Standardwert zugewiesen. "int a" beispielsweise weist "a" direkt 0 zu.
+Will man das umgehen, kann man das Schlüsselwort "uninitialized" benutzen.
+uninitialized int a // a muss zugewiesen werden, bevor es lesend benutzt werden kann
+
+Anstatt #[derive()] einfach externe Funktionen einbinden:
+	extern string toString()
+
+unknown als Typ für Datenelemente, deren Typ zur Kompilierzeit nicht bekannt ist. Aus Elementen diesen Typs kann nicht gelesen, oder geschrieben werden.
+Er muss erst zu einem anderen Typen übersetzt werden. Das ist zum Beispiel nützlich zum Einlesen von NBT-, oder JSON-Dateien, deren Typ anfangs nicht bekannt ist.
+
+Funktionen (nicht aber Befehle!), deren Parameter konstant sind und keine Abfragen außerhalb der Parameter machen, werden zur Kompilierzeit ausgeführt
+
+Strings werden wie folgt formatiert:
+"Hallo, {}. Ich heiße {}".format(["Welt", "MrKleeblatt"])
+"Hallo, {du}. Ich heiße {ich}".format({ich: "MrKleeblatt", du: "Welt"})
+
+Funktionen, die weniger als eine bestimmte Anzahl an Anweisungen (Assembly-Kalkül-Anweisungen) haben, werden standardmäßig als "inline"
+kompiliert. Die Anweisungen werden also eins zu eins in den bisherigen Verlauf kopiert. Das erhöht zwar die Dateigröße der ausführbaren
+Datei, aber erhöht auch die Geschwindigkeit, da das Programm nicht zwischen Funktionsreferenzen springen muss
+
+int a < 2
+int b < 42
+var int c < 5
+b < 63
